@@ -1,0 +1,64 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from ipywidgets import interact, FloatSlider, Dropdown
+
+# Función para generar el retículo en 2D
+def generate_2d_lattice(angle_deg, lattice_type, size):
+    angle_rad = np.radians(angle_deg)
+    
+    # Vectores de la celda unitaria para cada tipo de retículo
+    lattices = {
+        "Cuadrado": np.array([[1, 0], [0, 1]]),
+        "Rectangular": np.array([[1.5, 0], [0, 1]]),
+        "Oblicuo": np.array([[1, 0], [np.cos(angle_rad), np.sin(angle_rad)]]),
+        "Hexagonal": np.array([[1, 0], [0.5, np.sqrt(3) / 2]])
+    }
+    
+    if lattice_type not in lattices:
+        raise ValueError(f"Lattice type '{lattice_type}' no soportado.")
+    
+    # Obtener los vectores base del retículo
+    base_vectors = lattices[lattice_type]
+    
+    # Generar la red
+    points = []
+    for i in range(-size, size + 1):
+        for j in range(-size, size + 1):
+            point = i * base_vectors[0] + j * base_vectors[1]
+            points.append(point)
+    points = np.array(points)
+    
+    return points
+
+# Función para visualizar el retículo en 2D
+def plot_2d_lattice(angle, lattice_type, size):
+    points = generate_2d_lattice(angle, lattice_type, size)
+    
+    # Crear la figura
+    plt.figure(figsize=(8, 8))
+    plt.scatter(points[:, 0], points[:, 1], c='blue', s=50, label="Puntos de red")
+    
+    # Dibujar el ángulo si aplica
+    if lattice_type == "Oblicuo":
+        plt.plot([0, 1], [0, 0], 'r-', lw=2, label="Vector base 1")
+        plt.plot([0, np.cos(np.radians(angle))], [0, np.sin(np.radians(angle))], 'g-', lw=2, label="Vector base 2")
+        plt.text(0.5, 0.1, f"{angle}°", color="red", fontsize=12)
+    
+    # Configurar los ejes y el gráfico
+    plt.axhline(0, color='black', linewidth=0.5)
+    plt.axvline(0, color='black', linewidth=0.5)
+    plt.gca().set_aspect('equal', adjustable='box')
+    plt.title(f"Retículo {lattice_type} con ángulo {angle}°", fontsize=14)
+    plt.xlabel("X")
+    plt.ylabel("Y")
+    plt.legend()
+    plt.grid(True, linestyle='--', alpha=0.5)
+    plt.show()
+
+# Widget interactivo
+interact(
+    plot_2d_lattice,
+    angle=FloatSlider(value=90, min=30, max=150, step=1, description="Ángulo (°):"),
+    lattice_type=Dropdown(options=["Cuadrado", "Rectangular", "Oblicuo", "Hexagonal"], value="Cuadrado", description="Tipo de retículo:"),
+    size=FloatSlider(value=5, min=2, max=10, step=1, description="Tamaño:")
+)

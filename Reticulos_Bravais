@@ -1,0 +1,150 @@
+import numpy as np
+import plotly.graph_objects as go
+import plotly.offline as pyo
+pyo.init_notebook_mode(connected=True)
+
+
+# Definición de los vectores de las 14 celosías de Bravais en 3D
+# Cada celosía tiene tres vectores base: a1, a2, a3
+
+def generar_celosia_bravais(nombre):
+    """
+    Genera las coordenadas para los diferentes tipos de celosías de Bravais en 3D.
+    """
+    # Celosía cúbica simple
+    if nombre == "Cúbica simple":
+        a = 1
+        puntos = [(x, y, z) for x in [0, a] for y in [0, a] for z in [0, a]]
+
+    # Celosía cúbica centrada
+    elif nombre == "Cúbica centrada":
+        a = 1
+        puntos = [(x + 0.5, y + 0.5, z + 0.5) for x in [0, a] for y in [0, a] for z in [0, a]]
+        puntos += [(x, y, z) for x in [0, a] for y in [0, a] for z in [0, a]]
+
+    # Celosía cúbica cuerpo centrado
+    elif nombre == "Cúbica cuerpo centrado":
+        a = 1
+        puntos = [(x, y, z) for x in [0, a] for y in [0, a] for z in [0, a]]
+        puntos += [(0.5 * a, 0.5 * a, 0.5 * a)]
+
+    # Celosía tetragonal simple
+    elif nombre == "Tetragonal simple":
+        a = 1
+        c = 1.6
+        puntos = [(x, y, z) for x in [0, a] for y in [0, a] for z in [0, c]]
+
+    # Celosía tetragonal centrada
+    elif nombre == "Tetragonal centrada":
+        a = 1
+        c = 1.6
+        puntos = [(x, y, z) for x in [0, a] for y in [0, a] for z in [0, c]]
+        puntos += [(0.5 * a, 0.5 * a, 0.5 * c) for x in [0, a] for y in [0, a] for z in [0, c]]
+
+    # Celosía ortorrómbica simple
+    elif nombre == "Ortorrómbica simple":
+        a = 1
+        b = 1.5
+        c = 1.7
+        puntos = [(x, y, z) for x in [0, a] for y in [0, b] for z in [0, c]]
+
+    # Celosía ortorrómbica centrada
+    elif nombre == "Ortorrómbica centrada":
+        a = 1
+        b = 1.5
+        c = 1.7
+        puntos = [(x, y, z) for x in [0, a] for y in [0, b] for z in [0, c]]
+        puntos += [(0.5 * a, 0.5 * b, 0.5 * c)]
+
+    # Celosía monoclínica simple
+    elif nombre == "Monoclínica simple":
+        a = 1
+        b = 1.5
+        c = 1.6
+        alpha = 90  # Angulo entre los vectores
+        puntos = [(x, y, z) for x in [0, a] for y in [0, b] for z in [0, c]]
+
+    # Celosía monoclínica centrada
+    elif nombre == "Monoclínica centrada":
+        a = 1
+        b = 1.5
+        c = 1.6
+        alpha = 90  # Angulo entre los vectores
+        puntos = [(x, y, z) for x in [0, a] for y in [0, b] for z in [0, c]]
+        puntos += [(0.5 * a, 0.5 * b, 0.5 * c)]
+
+    # Celosía trigonal (o romboédrica)
+    elif nombre == "Trigonal":
+        a = 1
+        b = 1
+        c = 1
+        alpha = 90  # Angulo de los vectores
+        puntos = [(x, y, z) for x in [0, a] for y in [0, b] for z in [0, c]]
+
+    # Celosía hexagonal
+    elif nombre == "Hexagonal":
+        a = 1
+        c = 1.6
+        puntos = [(x, y, z) for x in [0, a] for y in [0, a] for z in [0, c]]
+
+    # Celosía cúbica face-centered (FCC)
+    elif nombre == "Cúbica face-centered":
+        a = 1
+        puntos = [(x, y, z) for x in [0, a] for y in [0, a] for z in [0, a]]
+        puntos += [(0.5 * a, 0.5 * a, z) for z in [0, a]]
+        puntos += [(0.5 * a, y, 0.5 * a) for y in [0, a]]
+        puntos += [(x, 0.5 * a, 0.5 * a) for x in [0, a]]
+
+    # Celosía trigonal (romboédrica)
+    elif nombre == "Trigonal":
+        a = 1
+        b = 1
+        c = 1
+        puntos = [(x, y, z) for x in [0, a] for y in [0, b] for z in [0, c]]
+
+    # Celosía triclinica
+    elif nombre == "Triclinica":
+        a = 1
+        b = 1
+        c = 1
+        alpha = 90
+        puntos = [(x, y, z) for x in [0, a] for y in [0, b] for z in [0, c]]
+
+    # Celosía hexagonal o romboédrica
+    elif nombre == "Hexagonal":
+        a = 1
+        b = 1
+        c = 1.6
+        puntos = [(x, y, z) for x in [0, a] for y in [0, b] for z in [0, c]]
+
+    return np.array(puntos)
+
+# Función para crear un gráfico 3D de la celosía seleccionada
+def visualizar_celosia(nombre):
+    puntos = generar_celosia_bravais(nombre)
+
+    fig = go.Figure(data=[go.Scatter3d(
+        x=puntos[:, 0],
+        y=puntos[:, 1],
+        z=puntos[:, 2],
+        mode='markers',
+        marker=dict(size=5, color='blue', opacity=0.8)
+    )])
+
+    # Etiqueta del título
+    fig.update_layout(
+        title=f"Retículo de Bravais: {nombre}",
+        scene=dict(
+            xaxis_title='X',
+            yaxis_title='Y',
+            zaxis_title='Z'
+        ),
+        margin=dict(l=0, r=0, b=0, t=40)
+    )
+
+    # Mostrar el gráfico
+    pyo.iplot(fig)
+()
+
+# Mostrar un ejemplo
+visualizar_celosia("Cúbica simple")
