@@ -20,6 +20,9 @@ def generate_2d_lattice(angle_deg, lattice_type, size):
     # Obtener los vectores base del retículo
     base_vectors = lattices[lattice_type]
     
+    # Convertir size a entero
+    size = int(size)
+    
     # Generar la red
     points = []
     for i in range(-size, size + 1):
@@ -28,37 +31,71 @@ def generate_2d_lattice(angle_deg, lattice_type, size):
             points.append(point)
     points = np.array(points)
     
-    return points
+    return points, base_vectors
+
+# Función para dibujar las conexiones entre puntos
+def draw_connections(ax, points, base_vectors, lattice_type):
+    if lattice_type in ["Cuadrado", "Rectangular", "Oblicuo"]:
+        for point in points:
+            neighbors = [
+                point + base_vectors[0],  # Vecino en dirección del primer vector base
+                point - base_vectors[0],
+                point + base_vectors[1],  # Vecino en dirección del segundo vector base
+                point - base_vectors[1]
+            ]
+            for neighbor in neighbors:
+                if any(np.allclose(neighbor, p) for p in points):
+                    ax.plot([point[0], neighbor[0]], [point[1], neighbor[1]], 'k-', lw=0.5)
+    
+    elif lattice_type == "Hexagonal":
+        hex_directions = [
+            base_vectors[0], 
+            -base_vectors[0],
+            base_vectors[1], 
+            -base_vectors[1],
+            base_vectors[0] - base_vectors[1],
+            base_vectors[1] - base_vectors[0]
+        ]
+        for point in points:
+            for direction in hex_directions:
+                neighbor = point + direction
+                if any(np.allclose(neighbor, p) for p in points):
+                    # Solo conectar puntos en los bordes, no el punto central
+                    if np.linalg.norm(direction) < 1.5:  # Distancia máxima para conexiones
+                        ax.plot([point[0], neighbor[0]], [point[1], neighbor[1]], 'k-', lw=0.5)
 
 # Función para visualizar el retículo en 2D
 def plot_2d_lattice(angle, lattice_type, size):
-    points = generate_2d_lattice(angle, lattice_type, size)
+    points, base_vectors = generate_2d_lattice(angle, lattice_type, size)
     
     # Crear la figura
-    plt.figure(figsize=(8, 8))
-    plt.scatter(points[:, 0], points[:, 1], c='blue', s=50, label="Puntos de red")
+    fig, ax = plt.subplots(figsize=(8, 8))
+    ax.scatter(points[:, 0], points[:, 1], c='blue', s=50, label="Puntos de red")
     
-    # Dibujar el ángulo si aplica
+    # Dibujar las conexiones
+    draw_connections(ax, points, base_vectors, lattice_type)
+    
+    # Dibujar vectores base si aplica
     if lattice_type == "Oblicuo":
-        plt.plot([0, 1], [0, 0], 'r-', lw=2, label="Vector base 1")
-        plt.plot([0, np.cos(np.radians(angle))], [0, np.sin(np.radians(angle))], 'g-', lw=2, label="Vector base 2")
-        plt.text(0.5, 0.1, f"{angle}°", color="red", fontsize=12)
+        ax.plot([0, base_vectors[0, 0]], [0, base_vectors[0, 1]], 'r-', lw=2, label="Vector base 1")
+        ax.plot([0, base_vectors[1, 0]], [0, base_vectors[1, 1]], 'g-', lw=2, label="Vector base 2")
+        ax.text(0.5 * base_vectors[0, 0], 0.5 * base_vectors[0, 1], f"{angle}°", color="red", fontsize=12)
     
     # Configurar los ejes y el gráfico
-    plt.axhline(0, color='black', linewidth=0.5)
-    plt.axvline(0, color='black', linewidth=0.5)
-    plt.gca().set_aspect('equal', adjustable='box')
-    plt.title(f"Retículo {lattice_type} con ángulo {angle}°", fontsize=14)
-    plt.xlabel("X")
-    plt.ylabel("Y")
-    plt.legend()
-    plt.grid(True, linestyle='--', alpha=0.5)
+    ax.axhline(0, color='black', linewidth=0.5)
+    ax.axvline(0, color='black', linewidth=0.5)
+    ax.set_aspect('equal', adjustable='box')
+    ax.set_title(f"Retículo {lattice_type} con ángulo {angle}°", fontsize=14)
+    ax.set_xlabel("X")
+    ax.set_ylabel("Y")
+    ax.legend()
+    ax.grid(True, linestyle='--', alpha=0.5)
     plt.show()
 
 # Widget interactivo
 interact(
     plot_2d_lattice,
-    angle=FloatSlider(value=90, min=30, max=150, step=1, description="Ángulo (°):"),
+    angle=FloatSlider(value=90, min=0, max=180, step=1, description="Ángulo (°):"),
     lattice_type=Dropdown(options=["Cuadrado", "Rectangular", "Oblicuo", "Hexagonal"], value="Cuadrado", description="Tipo de retículo:"),
     size=FloatSlider(value=5, min=2, max=10, step=1, description="Tamaño:")
 )

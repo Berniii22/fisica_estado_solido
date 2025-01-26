@@ -1,0 +1,12 @@
+
+# Python: ejemplo para abrir y leer un archivo
+notebook_path = "C:\\Users\\Bernardo\\OneDrive\\Escritorio\\FDSS\\Demonstration-The-14-3D-Bravais-Lattices-1-0-0-definition.nb"
+
+with open(notebook_path, "r", encoding="utf-8") as file:
+    contenido = file.read()
+
+# Guarda el contenido en un archivo Python
+with open("archivo_convertido.py", "w", encoding="utf-8") as output_file:
+    output_file.write(contenido)
+
+print("Archivo convertido y guardado como 'archivo_convertido.py'")
