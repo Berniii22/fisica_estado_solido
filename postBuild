@@ -1,4 +1,10 @@
+chmod +x postBuild
+git add postBuild
+git commit -m "Corrigiendo permisos de postBuild"
+git push origin main  # O el nombre de tu rama
+
 #!/bin/bash
 jupyter nbextension enable --py widgetsnbextension --sys-prefix
 jupyter nbextension install --py widgetsnbextension --sys-prefix
 jupyter nbextensions_configurator enable --sys-prefix
+
