@@ -1,6 +1,7 @@
-numpy
 matplotlib
-plotly
+numpy
 ipywidgets
 notebook
 widgetsnbextension
+jupyter_contrib_nbextensions
+plotly
