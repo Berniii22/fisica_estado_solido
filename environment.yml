@@ -1,9 +1,0 @@
-name: fisica_estado_solido
-channels:
-  - defaults
-dependencies:
-  - python=3.8
-  - numpy
-  - matplotlib
-  - plotly
-  - jupyter
