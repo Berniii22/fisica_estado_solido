@@ -5,3 +5,5 @@ notebook
 widgetsnbextension
 jupyter_contrib_nbextensions
 plotly
+ipympl
+
